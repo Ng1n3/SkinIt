@@ -6,6 +6,12 @@ export interface UserInput {
   name?: string;
 }
 
+export interface EditUserInput {
+  email?: string;
+  password?: string;
+  name?: string;
+}
+
 export interface UserDocument extends UserInput, mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
@@ -13,7 +19,7 @@ export interface UserDocument extends UserInput, mongoose.Document {
 
 const userSchema = new mongoose.Schema(
   {
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     name: { type: String, required: false },
   },

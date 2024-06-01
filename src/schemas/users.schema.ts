@@ -14,4 +14,15 @@ export const createUserSchema = object({
   }),
 });
 
+export const editUserSchema = object({
+  body: object({
+    name: string().optional(),
+    password: string()
+      .min(6, "Password too short - 6 minimum characters needed")
+      .optional(),
+    email: string().email("enter a valid email").optional(),
+  }),
+});
+
 export type CreateuserInput = TypeOf<typeof createUserSchema>;
+export type EdituserInput = TypeOf<typeof editUserSchema>;
