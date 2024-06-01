@@ -14,12 +14,18 @@ export interface EditUserInput {
   name?: string;
 }
 
+export interface SigninUserInputs {
+  email: string;
+  password: string;
+}
+
 export interface UserDocument extends UserInput, mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
+  comparePassword(password:string):Promise<boolean>
 }
 
-const userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema<UserDocument>(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -30,7 +36,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre<UserDocument>("save", async function (next) {
   let user = this as UserDocument;
   const salt = await bcrypt
     .genSalt(Number(process.env.SALT))

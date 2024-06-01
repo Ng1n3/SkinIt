@@ -1,11 +1,16 @@
 import { Request, Response } from "express";
-import { CreateuserInput, EdituserInput } from "../schemas/users.schema";
+import {
+  CreateuserInput,
+  EdituserInput,
+  SignInUserInput,
+} from "../schemas/users.schema";
 import {
   createUser,
   deleteUser,
   editUser,
   getUser,
   getusers,
+  signin,
 } from "../services/user.service";
 
 export async function createUserHandler(
@@ -17,6 +22,18 @@ export async function createUserHandler(
     return res.status(200).send(user);
   } catch (error: any) {
     return res.status(400).send(error.message);
+  }
+}
+
+export async function siginUserHandler(
+  req: Request<{}, {}, SignInUserInput["body"]>,
+  res: Response
+) {
+  try {
+    const user = await signin(req.body);
+    res.status(200).send(user);
+  } catch (error: any) {
+    res.status(400).send(error.message);
   }
 }
 

@@ -1,11 +1,27 @@
-import userModel, { EditUserInput, UserInput } from "../models/user.model";
+import userModel, {
+  EditUserInput,
+  SigninUserInputs,
+  UserInput,
+} from "../models/user.model";
 
 export async function createUser(input: UserInput) {
   try {
     const user = await userModel.create(input);
     return user;
   } catch (error: any) {
-    throw new Error(error);
+    throw new Error(error.message);
+  }
+}
+
+export async function signin(input: SigninUserInputs) {
+  try {
+    const user = await userModel.findOne({ email: input.email });
+    if (!user) throw new Error("user does not exist");
+    const isValid = await user.comparePassword(input.password);
+    if (!isValid) throw new Error("password incorrect");
+    return user;
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 }
 
@@ -40,10 +56,10 @@ export async function editUser(input: EditUserInput, id: string) {
   }
 }
 
-export async function deleteUser(id:string) {
+export async function deleteUser(id: string) {
   try {
     await userModel.findByIdAndDelete(id);
-  } catch (error:any) {
-    throw new Error(error.message)
+  } catch (error: any) {
+    throw new Error(error.message);
   }
 }
