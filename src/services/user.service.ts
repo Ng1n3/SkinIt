@@ -4,8 +4,13 @@ import userModel, {
   UserInput,
 } from "../models/user.model";
 
+
+
 export async function createUser(input: UserInput) {
   try {
+    const checkUser = await userModel.findOne({ email: input.email });
+    if (checkUser)
+      throw new Error("User already exists, please login or use another email");
     const user = await userModel.create(input);
     return user;
   } catch (error: any) {

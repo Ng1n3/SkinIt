@@ -13,13 +13,33 @@ import {
   signin,
 } from "../services/user.service";
 
+const REFRESH_TOKEN = {
+  secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
+  cookie: {
+    name: "refreshTkn",
+    options: {
+      samesite: "None",
+      secure: true,
+      httponly: false,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    },
+  },
+};
 export async function createUserHandler(
   req: Request<{}, {}, CreateuserInput["body"]>,
   res: Response
 ) {
   try {
     const user = await createUser(req.body);
-    return res.status(200).send(user);
+    const acTkn = user.generateAccessToken();
+    const rfTkn = user.generateRefreshToken();
+
+    res.cookie(REFRESH_TOKEN.cookie.name, rfTkn, REFRESH_TOKEN.cookie.options);
+    return res.status(201).send({
+      success: true,
+      user,
+      access_Token: acTkn,
+    });
   } catch (error: any) {
     return res.status(400).send(error.message);
   }
@@ -31,7 +51,16 @@ export async function siginUserHandler(
 ) {
   try {
     const user = await signin(req.body);
-    res.status(200).send(user);
+    const acTkn = user.generateAccessToken();
+    const rfTkn = user.generateRefreshToken();
+
+    res.cookie(REFRESH_TOKEN.cookie.name, rfTkn, REFRESH_TOKEN.cookie.options);
+
+    return res.status(200).send({
+      success: true,
+      user,
+      access_token: acTkn,
+    });
   } catch (error: any) {
     res.status(400).send(error.message);
   }
