@@ -5,6 +5,7 @@ import connect from "./utils/connect";
 import productRouter from "./routes/product.route";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import redisClient from "./utils/redisClient";
 
 dotenv.config();
 const app: Application = express();
@@ -23,7 +24,10 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(PORT, async () => {
+(async () => {
+  if (!redisClient.isOpen) await redisClient.connect();
   await connect();
-  console.log(`Server is listening on http://localhost:${PORT}`);
-});
+  app.listen(PORT, async () => {
+    console.log(`Server is listening on http://localhost:${PORT}`);
+  });
+})();
