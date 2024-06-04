@@ -4,7 +4,12 @@ import userModel, {
   UserInput,
 } from "../models/user.model";
 
-
+interface getUsersOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
 
 export async function createUser(input: UserInput) {
   try {
@@ -30,10 +35,32 @@ export async function signin(input: SigninUserInputs) {
   }
 }
 
-export async function getusers() {
+export async function getusers(options: getUsersOptions) {
   try {
-    const users = await userModel.find();
-    return users;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "asc",
+    } = options;
+
+    const skip = (page - 1) * limit;
+
+    const users = await userModel
+      .find()
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await userModel.countDocuments();
+
+    return {
+      users,
+      totalUsers,
+      totalPages: Math.ceil(totalUsers / limit),
+      currentPage: page,
+    };
+    
   } catch (error: any) {
     throw new Error(error.message);
   }

@@ -71,7 +71,16 @@ export async function siginUserHandler(
 
 export async function getUsersHandler(req: Request, res: Response) {
   try {
-    const users = await getusers();
+
+    const {page, limit, sortBy, sortOrder} = req.query;
+    const options = {
+      page: Number(page) || 1,
+      limit: Number(limit) || 10,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as 'asc' | 'desc'
+    }
+
+    const users = await getusers(options);
     if (res.locals.cacheKey) {
       await redisClient.set(
         res.locals.cacheKey,
