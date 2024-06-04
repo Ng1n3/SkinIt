@@ -12,9 +12,9 @@ import {
   getusers,
   signin,
 } from "../services/user.service";
-import  {setAsync}  from "../utils/redisClient";
+import redisClient from "../utils/redisClient";
 
-const DEFAULT_EXPIRATION = process.env.CACHING_DEFAULT_EXPIRATION;
+const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION)
 
 const REFRESH_TOKEN = {
   secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
@@ -72,8 +72,13 @@ export async function siginUserHandler(
 export async function getUsersHandler(req: Request, res: Response) {
   try {
     const users = await getusers();
-    if(res.locals.cacheKey) {
-      await setAsync(res.locals.cacheKey, JSON.stringify(users), 'EX', DEFAULT_EXPIRATION)
+    if (res.locals.cacheKey) {
+      await redisClient.set(
+        res.locals.cacheKey,
+        JSON.stringify(users),
+        {EX:
+        DEFAULT_EXPIRATION}
+      );
     }
     return res.status(200).send(users);
   } catch (error: any) {
@@ -87,8 +92,10 @@ export async function getUserHandler(
 ) {
   try {
     const user = await getUser(req.params.id);
-    if(res.locals.cacheKey) {
-      await setAsync(res.locals.cacheKey, JSON.stringify(user), 'EX', DEFAULT_EXPIRATION)
+    if (res.locals.cacheKey) {
+      await redisClient.set(res.locals.cacheKey, JSON.stringify(user), {
+        EX: DEFAULT_EXPIRATION,
+      });
     }
     return res.status(200).send(user);
   } catch (error: any) {

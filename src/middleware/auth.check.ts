@@ -24,6 +24,7 @@ export default async function checkAuthentication(
 ) {
   try {
     const authHeader = req.headers["authorization"];
+    console.log("authHeader: ", authHeader);
     if (!authHeader?.startsWith("Bearer "))
       throw new Error("You are not Authenticated");
     const accessTokenSplit = authHeader.split(" ");
@@ -31,7 +32,6 @@ export default async function checkAuthentication(
 
     const decoded = Jwt.verify(acTkn, ACCESS_TOKEN_SECRET);
 
-    console.log("decoded: ", decoded)
     if (typeof decoded === "object" && "_id" in decoded) {
       const payload = decoded as CustomPayload;
       req.userId = payload._id;
@@ -42,6 +42,7 @@ export default async function checkAuthentication(
 
     next();
   } catch (error: any) {
+    console.log("auth Error:")
     next(error.message);
   }
 }
