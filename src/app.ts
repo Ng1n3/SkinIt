@@ -24,6 +24,8 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+
+
 (async () => {
   if (!redisClient.isOpen) await redisClient.connect();
   await connect();
