@@ -1,7 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const ACCESS_TOKEN_EXPIRY = process.env.AUTH_ACCESS_TOKEN_EXPIRY;
 const REFRESH_TOKEN_SECRET = process.env.AUTH_REFRESH_TOKEN_SECRET;
 const REFRESH_TOKEN_EXPIRY = process.env.AUTH_REFRESH_TOKEN_EXPIRY;
 
+const RESET_TOKEN_SECRET = process.env.RESET_TOKEN_SECRET;
 
 if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET)
   throw new Error("Some secrets are missing");
@@ -23,6 +25,8 @@ export interface UserInput {
   password: string;
   name?: string;
   tokens?: { token: string }[];
+  resetPasswordToken?: string;
+  resetPasswordTokenExpiry?: Date;
 }
 
 export interface EditUserInput {
@@ -36,24 +40,31 @@ export interface SigninUserInputs {
   password: string;
 }
 
+export interface forgotPasswordInputs {
+  email: string;
+}
+
 export interface UserDocument extends UserInput, mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
   generateAccessToken(): string;
   generateRefreshToken(): string;
+  generateResetToken(): string;
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
   {
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, immutable: true },
     name: { type: String, required: false },
     tokens: [
       {
         token: { required: true, type: String },
       },
     ],
+    resetPasswordToken: { type: String },
+    resetPasswordTokenExpiry: { type: Date },
   },
   {
     timestamps: true,
@@ -116,6 +127,24 @@ userSchema.methods.generateRefreshToken = async function (): Promise<string> {
   this.tokens?.push({ token: rtHash });
   await this.save();
   return refreshToken;
+};
+
+userSchema.methods.generateResetToken = async function (): Promise<string> {
+  const resetToken =
+    crypto.randomBytes(20).toString("base64url") + RESET_TOKEN_SECRET;
+
+  const resetTokenHash = await bcrypt.hash(
+    resetToken,
+    Number(process.env.SALT)
+  );
+
+  this.resetPasswordToken = resetTokenHash;
+  this.resetPasswordTokenExpiry = new Date(
+    Date.now() + Number(process.env.RESET_PASSWORD_TOKEN_EXPIRY) * 60 * 1000
+  );
+
+  await this.save();
+  return resetToken;
 };
 
 const userModel = mongoose.model<UserDocument>("users", userSchema);

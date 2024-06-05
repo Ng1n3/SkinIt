@@ -3,12 +3,14 @@ import validateUser from "../middleware/validate.user";
 import {
   createUserSchema,
   editUserSchema,
+  forgotPasswordEmailSchema,
   signinUserSchema,
 } from "../schemas/users.schema";
 import {
   createUserHandler,
   deleteUserHandler,
   editUserHandler,
+  forgotPasswordHandler,
   getUserHandler,
   getUsersHandler,
   siginUserHandler,
@@ -44,5 +46,11 @@ userRouter.put(
 );
 
 userRouter.delete("/user/:id", checkAuthentication, deleteUserHandler);
+
+userRouter.post(
+  "/forgot-password",
+  validateUser(forgotPasswordEmailSchema),
+  forgotPasswordHandler
+);
 
 export default userRouter;

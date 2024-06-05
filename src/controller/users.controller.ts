@@ -3,18 +3,20 @@ import {
   CreateuserInput,
   EdituserInput,
   SignInUserInput,
+  forgotPasswordEmailInput,
 } from "../schemas/users.schema";
 import {
   createUser,
   deleteUser,
   editUser,
+  forgotPassword,
   getUser,
   getusers,
   signin,
 } from "../services/user.service";
 import redisClient from "../utils/redisClient";
 
-const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION)
+const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION);
 
 const REFRESH_TOKEN = {
   secret: process.env.AUTH_REFRESH_TOKEN_SECRET,
@@ -71,23 +73,19 @@ export async function siginUserHandler(
 
 export async function getUsersHandler(req: Request, res: Response) {
   try {
-
-    const {page, limit, sortBy, sortOrder} = req.query;
+    const { page, limit, sortBy, sortOrder } = req.query;
     const options = {
       page: Number(page) || 1,
       limit: Number(limit) || 10,
       sortBy: sortBy as string,
-      sortOrder: sortOrder as 'asc' | 'desc'
-    }
+      sortOrder: sortOrder as "asc" | "desc",
+    };
 
     const users = await getusers(options);
     if (res.locals.cacheKey) {
-      await redisClient.set(
-        res.locals.cacheKey,
-        JSON.stringify(users),
-        {EX:
-        DEFAULT_EXPIRATION}
-      );
+      await redisClient.set(res.locals.cacheKey, JSON.stringify(users), {
+        EX: DEFAULT_EXPIRATION,
+      });
     }
     return res.status(200).send(users);
   } catch (error: any) {
@@ -136,5 +134,18 @@ export async function deleteUserHandler(
     });
   } catch (error: any) {
     res.status(400).send(error.message);
+  }
+}
+
+export async function forgotPasswordHandler(
+  req: Request<{}, {}, forgotPasswordEmailInput["body"]>,
+  res: Response
+) {
+  try {
+    const { email } = req.body;
+    const reponse = await forgotPassword(email);
+    res.status(200).send(reponse);
+  } catch (error: any) {
+    res.status(400).send({ error: error.message });
   }
 }

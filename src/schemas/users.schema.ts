@@ -17,13 +17,13 @@ export const createUserSchema = object({
 export const signinUserSchema = object({
   body: object({
     email: string({
-      required_error: "please enter your email"
+      required_error: "please enter your email",
     }).email("enter a valid email"),
     password: string({
-      required_error: 'Enter your password'
-    }).min(6, 'password too short - 6 minimum characters needed')
-  })
-})
+      required_error: "Enter your password",
+    }).min(6, "password too short - 6 minimum characters needed"),
+  }),
+});
 
 export const editUserSchema = object({
   body: object({
@@ -35,6 +35,17 @@ export const editUserSchema = object({
   }),
 });
 
+export const forgotPasswordEmailSchema = object({
+  body: object({
+    email: string({ required_error: "please enter an email" }).email(
+      "enter a valid email"
+    ),
+  }),
+});
+
 export type CreateuserInput = TypeOf<typeof createUserSchema>;
 export type EdituserInput = TypeOf<typeof editUserSchema>;
 export type SignInUserInput = TypeOf<typeof signinUserSchema>;
+export type forgotPasswordEmailInput = TypeOf<
+  typeof forgotPasswordEmailSchema
+>;

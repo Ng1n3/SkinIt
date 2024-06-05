@@ -3,6 +3,7 @@ import userModel, {
   SigninUserInputs,
   UserInput,
 } from "../models/user.model";
+import transporter from "../utils/nodemailer";
 
 interface getUsersOptions {
   page?: number;
@@ -60,7 +61,6 @@ export async function getusers(options: getUsersOptions) {
       totalPages: Math.ceil(totalUsers / limit),
       currentPage: page,
     };
-    
   } catch (error: any) {
     throw new Error(error.message);
   }
@@ -92,6 +92,34 @@ export async function deleteUser(id: string) {
   try {
     await userModel.findByIdAndDelete(id);
   } catch (error: any) {
+    throw new Error(error.message);
+  }
+}
+
+export async function forgotPassword(email: string) {
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) throw new Error("User with given email does not exist");
+
+    const resetToken = user.generateResetToken();
+
+    const resetUrl = `http://localhost:3020/reset-password?token=${resetToken}`;
+
+    const messgae = `
+    <h1>Password Reset</h1>
+    <p>You requested a password reset</p>
+    <p>Click this <a href="${resetUrl}" target="_blank">link</a> to reset your password</p>
+    `;
+
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to: user.email,
+      subject: "Password Reset",
+      html: messgae,
+    });
+
+    return { message: "password reset email sent" };
+  } catch (error:any) {
     throw new Error(error.message);
   }
 }
