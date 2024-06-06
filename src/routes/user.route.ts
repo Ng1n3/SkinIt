@@ -45,6 +45,8 @@ userRouter.put(
   editUserHandler
 );
 
+
+
 userRouter.delete("/user/:id", checkAuthentication, deleteUserHandler);
 
 userRouter.post(
