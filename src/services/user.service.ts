@@ -101,7 +101,7 @@ export async function forgotPassword(email: string) {
     const user = await userModel.findOne({ email });
     if (!user) throw new Error("User with given email does not exist");
 
-    const resetToken = user.generateResetToken();
+    const resetToken = await user.generateResetToken();
 
     const resetUrl = `http://localhost:3020/reset-password?token=${resetToken}`;
 
