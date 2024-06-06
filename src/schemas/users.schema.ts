@@ -43,9 +43,20 @@ export const forgotPasswordEmailSchema = object({
   }),
 });
 
+export const resetPasswordSchema = object({
+  body: object({
+    token: string({ required_error: "Please enter your token" }),
+    email: string({ required_error: "Please input your email" }).email(
+      "please enter a correct email address"
+    ),
+    newPassword: string({
+      required_error: "enter your new password",
+    }).min(6, "Passoword too short - 6 minimum characters needed"),
+  }),
+});
+
 export type CreateuserInput = TypeOf<typeof createUserSchema>;
 export type EdituserInput = TypeOf<typeof editUserSchema>;
 export type SignInUserInput = TypeOf<typeof signinUserSchema>;
-export type forgotPasswordEmailInput = TypeOf<
-  typeof forgotPasswordEmailSchema
->;
+export type ForgotPasswordEmailInput = TypeOf<typeof forgotPasswordEmailSchema>;
+export type ResetPasswordInput = TypeOf<typeof resetPasswordSchema>;

@@ -4,6 +4,7 @@ import {
   createUserSchema,
   editUserSchema,
   forgotPasswordEmailSchema,
+  resetPasswordSchema,
   signinUserSchema,
 } from "../schemas/users.schema";
 import {
@@ -13,6 +14,7 @@ import {
   forgotPasswordHandler,
   getUserHandler,
   getUsersHandler,
+  resetPasswordHandler,
   siginUserHandler,
 } from "../controller/users.controller";
 import checkAuthentication from "../middleware/auth.check";
@@ -53,5 +55,10 @@ userRouter.post(
   forgotPasswordHandler
 );
 
+userRouter.post(
+  "/reset-password/:id",
+  validateUser(resetPasswordSchema),
+  resetPasswordHandler
+);
 
 export default userRouter;

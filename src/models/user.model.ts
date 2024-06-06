@@ -51,6 +51,7 @@ export interface UserDocument extends UserInput, mongoose.Document {
   generateAccessToken(): string;
   generateRefreshToken(): string;
   generateResetToken(): string;
+  resetPassword(token:string, newPassword:string): Promise<void>;
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -145,6 +146,26 @@ userSchema.methods.generateResetToken = async function (): Promise<string> {
 
   await this.save();
   return resetToken;
+};
+
+userSchema.methods.resetPassword = async function (
+  token: string,
+  newPassword: string
+): Promise<void> {
+  const isTokenValid = await bcrypt.compare(
+    token,
+    this.resetPasswordToken || ""
+  );
+
+  // if (!isTokenValid)
+  if (!isTokenValid || Date.now() > this.resetPasswordTokenExpiry)
+    throw new Error("Invalid or expired password reset token from model");
+
+  this.password = newPassword;
+  this.resetPasswordToken = undefined;
+  this.resetPasswordTokenExpiry = undefined;
+
+  await this.save();
 };
 
 const userModel = mongoose.model<UserDocument>("users", userSchema);

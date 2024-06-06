@@ -103,7 +103,7 @@ export async function forgotPassword(email: string) {
 
     const resetToken = await user.generateResetToken();
 
-    const resetUrl = `http://localhost:3020/reset-password?token=${resetToken}`;
+    const resetUrl = `http://localhost:3020/reset-password/${resetToken}`;
 
     const messgae = `
     <h1>Password Reset</h1>
@@ -118,8 +118,24 @@ export async function forgotPassword(email: string) {
       html: messgae,
     });
 
-    return { message: "password reset email sent" };
-  } catch (error:any) {
+    return { message: "password reset email sent", resetToken };
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}
+
+export async function resetpassword(
+  token: string,
+  email: string,
+  newPassword: string
+) {
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) throw new Error("Invalid or expirted password reset token");
+    await user.resetPassword(token, newPassword);
+
+    return { message: "Password reset Succesfull" };
+  } catch (error: any) {
     throw new Error(error.message);
   }
 }

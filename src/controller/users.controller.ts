@@ -3,7 +3,8 @@ import {
   CreateuserInput,
   EdituserInput,
   SignInUserInput,
-  forgotPasswordEmailInput,
+  ForgotPasswordEmailInput,
+  ResetPasswordInput,
 } from "../schemas/users.schema";
 import {
   createUser,
@@ -12,6 +13,7 @@ import {
   forgotPassword,
   getUser,
   getusers,
+  resetpassword,
   signin,
 } from "../services/user.service";
 import redisClient from "../utils/redisClient";
@@ -138,13 +140,26 @@ export async function deleteUserHandler(
 }
 
 export async function forgotPasswordHandler(
-  req: Request<{}, {}, forgotPasswordEmailInput["body"]>,
+  req: Request<{}, {}, ForgotPasswordEmailInput["body"]>,
   res: Response
 ) {
   try {
     const { email } = req.body;
     const reponse = await forgotPassword(email);
     res.status(200).send(reponse);
+  } catch (error: any) {
+    res.status(400).send({ error: error.message });
+  }
+}
+
+export async function resetPasswordHandler(
+  req: Request<{ id: string }, {}, ResetPasswordInput["body"]>,
+  res: Response
+) {
+  try {
+    const { token, email, newPassword } = req.body;
+    const response = await resetpassword(token, email, newPassword);
+    return res.status(200).send(response);
   } catch (error: any) {
     res.status(400).send({ error: error.message });
   }
