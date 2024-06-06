@@ -24,7 +24,6 @@ export default async function checkAuthentication(
 ) {
   try {
     const authHeader = req.headers["authorization"];
-    console.log("authHeader: ", authHeader);
     if (!authHeader?.startsWith("Bearer "))
       throw new Error("You are not Authenticated");
     const accessTokenSplit = authHeader.split(" ");

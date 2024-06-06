@@ -11,6 +11,7 @@ import {
 } from "../controller/product.controller";
 import checkAuthentication from "../middleware/auth.check";
 import cacheMiddleware from "../middleware/cache";
+import { checkRole } from "../middleware/auth.role";
 
 const productRouter = Router();
 
@@ -30,11 +31,17 @@ productRouter.get(
 productRouter.get(
   "/product/:id",
   cacheMiddleware("product"),
+  checkAuthentication,
   getProductHandler
 );
 
 productRouter.put("/product/:id", checkAuthentication, updateProductHandler);
 
-productRouter.delete("/product/:id", checkAuthentication, deleteProductHandler);
+productRouter.delete(
+  "/product/:id",
+  checkAuthentication,
+  checkRole("admin"),
+  deleteProductHandler
+);
 
 export default productRouter;

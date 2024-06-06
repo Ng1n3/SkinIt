@@ -19,6 +19,7 @@ import {
 } from "../controller/users.controller";
 import checkAuthentication from "../middleware/auth.check";
 import cacheMiddleware from "../middleware/cache";
+import { checkOwnerShip, checkRole } from "../middleware/auth.role";
 
 const userRouter = Router();
 
@@ -44,6 +45,7 @@ userRouter.put(
   "/user/:id",
   checkAuthentication,
   validateUser(editUserSchema),
+  checkOwnerShip,
   editUserHandler
 );
 
@@ -52,6 +54,7 @@ userRouter.delete("/user/:id", checkAuthentication, deleteUserHandler);
 userRouter.post(
   "/forgot-password",
   validateUser(forgotPasswordEmailSchema),
+  checkRole("admin"),
   forgotPasswordHandler
 );
 

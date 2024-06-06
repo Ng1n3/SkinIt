@@ -24,6 +24,7 @@ export interface UserInput {
   email: string;
   password: string;
   name?: string;
+  role?: string;
   tokens?: { token: string }[];
   resetPasswordToken?: string;
   resetPasswordTokenExpiry?: Date;
@@ -59,6 +60,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, immutable: true },
     name: { type: String, required: false },
+    role: {type: String, required: true, default: 'user'},
     tokens: [
       {
         token: { required: true, type: String },
