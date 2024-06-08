@@ -49,7 +49,12 @@ userRouter.put(
   editUserHandler
 );
 
-userRouter.delete("/user/:id", checkAuthentication, deleteUserHandler);
+userRouter.delete(
+  "/user/:id",
+  checkOwnerShip,
+  checkAuthentication,
+  deleteUserHandler
+);
 
 userRouter.post(
   "/forgot-password",
