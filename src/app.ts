@@ -6,8 +6,10 @@ import productRouter from "./routes/product.route";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import redisClient from "./utils/redisClient";
+import morgan from "morgan";
+import logger from "./utils/logger";
+import winston from "winston";
 import morganMiddleWare from "./middleware/MorganMiddleware";
-import Logger from "./utils/logger";
 
 dotenv.config();
 const app: Application = express();
@@ -21,7 +23,7 @@ app.use("/api/v1", userRouter);
 app.use("/api/v1", productRouter);
 
 app.use("*", (req: Request, res: Response, next: NextFunction) => {
-  Logger.error("Resource not found");
+  logger.error("Resource not found");
   res.status(404).send({
     status: "FAILED",
     message: "sorry, resource is not found 😟",
@@ -35,3 +37,5 @@ app.use("*", (req: Request, res: Response, next: NextFunction) => {
     console.log(`Server is listening on http://localhost:${PORT}`);
   });
 })();
+
+export default app;

@@ -2,6 +2,7 @@ import productModel, {
   ProductInput,
   editProductInput,
 } from "../models/product.model";
+import Logger from "../utils/logger";
 
 interface getProductOptions {
   page?: number;
@@ -53,7 +54,8 @@ export async function getProduct(id: string) {
     if (!product) throw new Error("product not found");
     return product;
   } catch (error: any) {
-    throw new Error(error.message);
+    Logger.error(error.message)
+    throw new Error("Resource does not exist 🥲");
   }
 }
 
