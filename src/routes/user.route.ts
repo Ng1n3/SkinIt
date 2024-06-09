@@ -36,8 +36,8 @@ userRouter.get(
 
 userRouter.get(
   "/user/:id",
-  cacheMiddleware("user"),
   checkAuthentication,
+  cacheMiddleware("user"),
   getUserHandler
 );
 

@@ -6,6 +6,8 @@ import productRouter from "./routes/product.route";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import redisClient from "./utils/redisClient";
+import morganMiddleWare from "./middleware/MorganMiddleware";
+import Logger from "./utils/logger";
 
 dotenv.config();
 const app: Application = express();
@@ -13,20 +15,18 @@ const PORT = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
+app.use(morganMiddleWare);
 app.use(cookieParser());
 app.use("/api/v1", userRouter);
 app.use("/api/v1", productRouter);
 
-app.all("*", (req: Request, res: Response, next: NextFunction) => {
+app.use("*", (req: Request, res: Response, next: NextFunction) => {
+  Logger.error("Resource not found");
   res.status(404).send({
     status: "FAILED",
     message: "sorry, resource is not found 😟",
   });
 });
-
-
-
-
 
 (async () => {
   if (!redisClient.isOpen) await redisClient.connect();

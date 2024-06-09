@@ -3,6 +3,13 @@ import productModel, {
   editProductInput,
 } from "../models/product.model";
 
+interface getProductOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
 export async function createProduct(input: ProductInput) {
   try {
     const product = await productModel.create(input);
@@ -12,10 +19,29 @@ export async function createProduct(input: ProductInput) {
   }
 }
 
-export async function getProducts() {
+export async function getProducts(options: getProductOptions) {
   try {
-    const products = await productModel.find();
-    return products;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      sortOrder = "asc",
+    } = options;
+
+    const skip = (page - 1) * limit;
+    const products = await productModel
+      .find()
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit);
+
+    const totalProducts = await productModel.countDocuments();
+    return {
+      products,
+      totalProducts,
+      totalPages: Math.ceil(totalProducts / limit),
+      currentPage: page,
+    };
   } catch (error: any) {
     throw new Error(error.message);
   }
@@ -35,7 +61,7 @@ export async function updateProduct(id: string, input: editProductInput) {
   try {
     const checkProduct = await productModel.findById(id);
     if (!checkProduct) throw new Error("product not found");
-    const product = await productModel.findByIdAndUpdate(id,input);
+    const product = await productModel.findByIdAndUpdate(id, input);
     return product;
   } catch (error: any) {
     throw new Error(error.message);

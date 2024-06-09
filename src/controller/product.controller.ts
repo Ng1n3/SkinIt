@@ -10,6 +10,10 @@ import {
   getProducts,
   updateProduct,
 } from "../services/product.service";
+import Logger from "../utils/logger";
+import redisClient from "../utils/redisClient";
+
+const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION);
 
 export async function createproductHandler(
   req: Request<{}, {}, CreateProductInput["body"]>,
@@ -25,9 +29,22 @@ export async function createproductHandler(
 
 export async function getProductsHandlers(req: Request, res: Response) {
   try {
-    const products = await getProducts();
+    const {page, limit, sortBy, sortOrder} = req.query
+    const options = {
+      page: Number(page) || 1,
+      limit: Number(limit) || 10,
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as 'asc' | 'desc'
+    }
+    const products = await getProducts(options);
+    if(res.locals.cacheKey) {
+      await redisClient.set(res.locals.cacheKey, JSON.stringify(products), {
+        EX: DEFAULT_EXPIRATION
+      })
+    }
     res.status(200).send(products);
   } catch (error: any) {
+    Logger.error(error.message)
     res.status(404).send(error.message);
   }
 }
@@ -38,6 +55,12 @@ export async function getProductHandler(
 ) {
   try {
     const product = await getProduct(req.params.id);
+    
+    if(res.locals.cacheKey) {
+      await redisClient.set(res.locals.cacheKey, JSON.stringify(product), {
+        EX: DEFAULT_EXPIRATION
+      })
+    }
     res.status(200).send(product);
   } catch (error: any) {
     res.status(404).send(error.message);
@@ -65,7 +88,7 @@ export async function deleteProductHandler(
     res.send(200).send({
       status: "OK",
       message: "product deleted",
-      product
+      product,
     });
   } catch (error: any) {
     res.status(400).send(error.message);
