@@ -8,9 +8,10 @@ const ACCESS_TOKEN_SECRET = process.env.AUTH_ACCESS_TOKEN_SECRET as string;
 
 if (!ACCESS_TOKEN_SECRET) throw new Error("some secrets are missing");
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest<T = any> extends Request {
   userId?: string;
   token?: string;
+  body: T;
 }
 
 interface CustomPayload extends JwtPayload {
@@ -41,7 +42,7 @@ export default async function checkAuthentication(
 
     next();
   } catch (error: any) {
-    console.log("auth Error:")
+    console.log("auth Error:");
     next(error.message);
   }
 }

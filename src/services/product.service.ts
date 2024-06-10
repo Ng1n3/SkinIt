@@ -1,4 +1,5 @@
 import productModel, {
+  ProductDocument,
   ProductInput,
   editProductInput,
 } from "../models/product.model";
@@ -11,7 +12,9 @@ interface getProductOptions {
   sortOrder?: "asc" | "desc";
 }
 
-export async function createProduct(input: ProductInput) {
+export async function createProduct(
+  input: ProductInput
+): Promise<ProductDocument> {
   try {
     const product = await productModel.create(input);
     return product;
@@ -54,7 +57,7 @@ export async function getProduct(id: string) {
     if (!product) throw new Error("product not found");
     return product;
   } catch (error: any) {
-    Logger.error(error.message)
+    Logger.error(error.message);
     throw new Error("Resource does not exist 🥲");
   }
 }
