@@ -5,6 +5,7 @@ import morganMiddleWare from "../middleware/MorganMiddleware";
 import cookieParser from "cookie-parser";
 import userRouter from "../routes/user.route";
 import productRouter from "../routes/product.route";
+import errorHandler from "../middleware/errorHandler";
 
 export default function createServer() {
   const app: Application = express();
@@ -15,6 +16,7 @@ export default function createServer() {
   app.use(cookieParser());
   app.use("/api/v1", userRouter);
   app.use("/api/v1", productRouter);
+  app.use(errorHandler);
 
   return app;
 }

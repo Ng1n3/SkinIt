@@ -2,9 +2,6 @@ import { TypeOf, array, object, string } from "zod";
 
 export const createProductSchema = object({
   body: object({
-    // seller: string({
-    //   required_error: "sellers id is required",
-    // }),
     name: string({
       required_error: "please give the item a name",
     }),
@@ -39,9 +36,6 @@ export const updateProductSchema = object({
     description: string({
       required_error: "Enter a description",
     }).optional(),
-    // seller: string({
-    //   required_error: "sellers id is required",
-    // }),
     genre: array(
       string({
         required_error: "Genre should be an array of genres",

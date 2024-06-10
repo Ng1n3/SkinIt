@@ -17,6 +17,7 @@ import {
   signin,
 } from "../services/user.service";
 import redisClient from "../utils/redisClient";
+import logger from "../utils/logger";
 
 const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION);
 
@@ -48,6 +49,7 @@ export async function createUserHandler(
       access_Token: acTkn,
     });
   } catch (error: any) {
+    logger.error(error.message)
     return res.status(400).send(error.message);
   }
 }
@@ -69,6 +71,7 @@ export async function siginUserHandler(
       access_token: acTkn,
     });
   } catch (error: any) {
+    logger.error(error.message)
     res.status(400).send(error.message);
   }
 }
@@ -91,6 +94,7 @@ export async function getUsersHandler(req: Request, res: Response) {
     }
     return res.status(200).send(users);
   } catch (error: any) {
+    logger.error(error.message)
     return res.status(400).send(error.message);
   }
 }
@@ -108,6 +112,7 @@ export async function getUserHandler(
     }
     return res.status(200).send(user);
   } catch (error: any) {
+    logger.error(error.message)
     res.status(404).send(error.message);
   }
 }
@@ -120,6 +125,7 @@ export async function editUserHandler(
     const user = await editUser(req.body, req.params.id);
     res.status(200).send(user);
   } catch (error: any) {
+    logger.error(error.message)
     res.status(400).send(error.message);
   }
 }
@@ -130,11 +136,12 @@ export async function deleteUserHandler(
 ) {
   try {
     const user = deleteUser(req.params.id);
-    res.status(200).send({
+    res.status(204).send({
       status: "OK",
       message: "user Deleted",
     });
   } catch (error: any) {
+    logger.error(error.message)
     res.status(400).send(error.message);
   }
 }
@@ -148,6 +155,7 @@ export async function forgotPasswordHandler(
     const reponse = await forgotPassword(email);
     res.status(200).send(reponse);
   } catch (error: any) {
+    logger.error(error.message)
     res.status(400).send({ error: error.message });
   }
 }
@@ -161,6 +169,7 @@ export async function resetPasswordHandler(
     const response = await resetpassword(token, email, newPassword);
     return res.status(200).send(response);
   } catch (error: any) {
+    logger.error(error.message)
     res.status(400).send({ error: error.message });
   }
 }

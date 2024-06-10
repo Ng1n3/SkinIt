@@ -13,6 +13,7 @@ import {
 import Logger from "../utils/logger";
 import redisClient from "../utils/redisClient";
 import { AuthenticatedRequest } from "../middleware/auth.check";
+import logger from "../utils/logger";
 
 const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION);
 
@@ -31,8 +32,9 @@ export async function createproductHandler(
       description,
       units,
     });
-    res.status(200).send(product);
+    res.status(201).send(product);
   } catch (error: any) {
+    logger.error(error.message);
     res.status(400).send(error.message);
   }
 }
@@ -73,6 +75,7 @@ export async function getProductHandler(
     }
     res.status(200).send(product);
   } catch (error: any) {
+    logger.error(error.message);
     res.status(404).send(error.message);
   }
 }
@@ -85,6 +88,7 @@ export async function updateProductHandler(
     const user = await updateProduct(req.params.id, req.body);
     res.status(200).send(user);
   } catch (error: any) {
+    logger.error(error.message);
     res.status(400).send(error.message);
   }
 }
@@ -95,12 +99,13 @@ export async function deleteProductHandler(
 ) {
   try {
     const product = await deleteProduct(req.params.id);
-    res.send(200).send({
+    res.send(204).send({
       status: "OK",
       message: "product deleted",
       product,
     });
   } catch (error: any) {
+    logger.error(error.message);
     res.status(400).send(error.message);
   }
 }

@@ -1,7 +1,6 @@
 import path from "path";
 import fs from "fs";
 import winston from "winston";
-import { StreamOptions } from "morgan";
 
 // Define the log directory path
 const logDirectory = path.join(__dirname, "../../logs");
