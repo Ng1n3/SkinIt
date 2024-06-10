@@ -2,7 +2,7 @@
 
 ### REST API
 
-This project is a rest API built with a robust set of technologies to ensure security, scalability, and efficiency
+This project is a rest API built with a robust set of technologies to ensure security, scalability, and efficiency.
 
 ### TECHNOLOGIES USED
 
@@ -112,7 +112,7 @@ You can run the project using configured scripts.
   "password": "string"
   }
   ```
-- Response: `200 OK`
+- Response: `201 Created`
 
 #### Signin
 
@@ -240,8 +240,8 @@ You can run the project using configured scripts.
 
 ### Conclusion
 
-This documentation provides an overview of the REST API, including its features, configuration, setup, and endpoint details. Follow the setup instructions carefully and use the provided examples to interact with the API. For further details or assistance, refer to the comments in the source code or contact the development team.
+This documentation provides an overview of the REST API, including its features, configuration, setup, and endpoint details. Follow the setup instructions carefully and use the provided examples to interact with the API. For further details or assistance, refer to the comments in the source code or contact [@Muyiwa](mailto:code.with.muyiwa@gmail.com).
 
 ## Author
-- Email: [@Ng1n3](mailto:code.with.muyiwa@gmail.com)
+- Email: [@Muyiwa](mailto:code.with.muyiwa@gmail.com)
 
