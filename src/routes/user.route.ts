@@ -1,5 +1,5 @@
 import { Router } from "express";
-import validateUser from "../middleware/validate.user";
+import validateResource from "../middleware/validate.resource.middleware";
 import {
   createUserSchema,
   editUserSchema,
@@ -17,15 +17,23 @@ import {
   resetPasswordHandler,
   siginUserHandler,
 } from "../controller/users.controller";
-import checkAuthentication from "../middleware/auth.check";
-import cacheMiddleware from "../middleware/cache";
-import { checkOwnerShip, checkRole } from "../middleware/auth.role";
+import checkAuthentication from "../middleware/auth.check.middleware";
+import cacheMiddleware from "../middleware/cache.middleware";
+import { checkOwnerShip, checkRole } from "../middleware/auth.role.middleware";
 
 const userRouter = Router();
 
-userRouter.post("/signup", validateUser(createUserSchema), createUserHandler);
+userRouter.post(
+  "/signup",
+  validateResource(createUserSchema),
+  createUserHandler
+);
 
-userRouter.post("/signin", validateUser(signinUserSchema), siginUserHandler);
+userRouter.post(
+  "/signin",
+  validateResource(signinUserSchema),
+  siginUserHandler
+);
 
 userRouter.get(
   "/users",
@@ -44,7 +52,7 @@ userRouter.get(
 userRouter.put(
   "/user/:id",
   checkAuthentication,
-  validateUser(editUserSchema),
+  validateResource(editUserSchema),
   checkOwnerShip,
   editUserHandler
 );
@@ -58,14 +66,14 @@ userRouter.delete(
 
 userRouter.post(
   "/forgot-password",
-  validateUser(forgotPasswordEmailSchema),
+  validateResource(forgotPasswordEmailSchema),
   checkRole("admin"),
   forgotPasswordHandler
 );
 
 userRouter.post(
   "/reset-password/:id",
-  validateUser(resetPasswordSchema),
+  validateResource(resetPasswordSchema),
   resetPasswordHandler
 );
 

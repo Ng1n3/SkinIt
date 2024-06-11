@@ -1,7 +1,7 @@
 import { Router } from "express";
-import validateProduct from "../middleware/validate.product";
+import validateResource from "../middleware/validate.resource.middleware";
 import { createProductSchema } from "../schemas/product.schema";
-import { createUserHandler } from "../controller/users.controller";
+
 import {
   createproductHandler,
   deleteProductHandler,
@@ -9,16 +9,16 @@ import {
   getProductsHandlers,
   updateProductHandler,
 } from "../controller/product.controller";
-import checkAuthentication from "../middleware/auth.check";
-import cacheMiddleware from "../middleware/cache";
-import { checkRole } from "../middleware/auth.role";
+import checkAuthentication from "../middleware/auth.check.middleware";
+import cacheMiddleware from "../middleware/cache.middleware";
+import { checkRole } from "../middleware/auth.role.middleware";
 
 const productRouter = Router();
 
 productRouter.post(
   "/product-create",
   checkAuthentication,
-  validateProduct(createProductSchema),
+  validateResource(createProductSchema),
   createproductHandler
 );
 
@@ -31,7 +31,7 @@ productRouter.get(
 productRouter.get(
   "/product/:id",
   cacheMiddleware("product"),
-  // checkAuthentication,
+  checkAuthentication,
   getProductHandler
 );
 

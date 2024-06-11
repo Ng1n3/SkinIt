@@ -12,7 +12,7 @@ import {
 } from "../services/product.service";
 import Logger from "../utils/logger";
 import redisClient from "../utils/redisClient";
-import { AuthenticatedRequest } from "../middleware/auth.check";
+import { AuthenticatedRequest } from "../middleware/auth.check.middleware";
 import logger from "../utils/logger";
 
 const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION);
