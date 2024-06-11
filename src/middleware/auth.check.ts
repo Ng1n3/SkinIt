@@ -30,19 +30,17 @@ export default async function checkAuthentication(
     const accessTokenSplit = authHeader.split(" ");
     const acTkn = accessTokenSplit[1];
 
-    const decoded = Jwt.verify(acTkn, ACCESS_TOKEN_SECRET);
+    const decoded = Jwt.verify(acTkn, ACCESS_TOKEN_SECRET) as CustomPayload;
 
-    if (typeof decoded === "object" && "_id" in decoded) {
-      const payload = decoded as CustomPayload;
-      req.userId = payload._id;
+    if (decoded && decoded._id) {
+      req.userId = decoded._id;
       req.token = acTkn;
+      next();
     } else {
       throw new Error("Invalid token");
     }
-
-    next();
   } catch (error: any) {
-    console.log("auth Error:");
-    next(error.message);
+    console.log(error);
+    next(error);
   }
 }

@@ -50,9 +50,10 @@ export interface UserDocument extends UserInput, mongoose.Document {
   updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
   generateAccessToken(): string;
-  generateRefreshToken(): string;
-  generateResetToken(): string;
-  resetPassword(token:string, newPassword:string): Promise<void>;
+  generateRefreshToken(): Promise<string>;
+  regenerateAccessToken(refreshToken: string): Promise<string>;
+  generateResetToken(): Promise<string>;
+  resetPassword(token: string, newPassword: string): Promise<void>;
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -60,7 +61,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
     email: { type: String, required: true, unique: true, immutable: true },
     password: { type: String, required: true, immutable: true },
     name: { type: String, required: false },
-    role: {type: String, required: true, default: 'user'},
+    role: { type: String, required: true, default: "user" },
     tokens: [
       {
         token: { required: true, type: String },
@@ -127,9 +128,28 @@ userSchema.methods.generateRefreshToken = async function (): Promise<string> {
 
   const rtHash = await bcrypt.hash(refreshToken, Number(process.env.SALT));
 
-  this.tokens?.push({ token: rtHash });
+  this.tokens = [{ token: rtHash }];
   await this.save();
   return refreshToken;
+};
+
+userSchema.methods.regenrateAccessToken = async function (
+  refreshToken: string
+): Promise<string> {
+  const tokenDocument = this.tokens[0];
+  if (!tokenDocument) throw new Error("No refresh token found");
+
+  const isTokenValid = await bcrypt.compare(refreshToken, tokenDocument.token);
+  if (!isTokenValid) throw new Error("Invalid refresh token");
+
+  try {
+    Jwt.verify(refreshToken, REFRESH_TOKEN_SECRET); //check if refresh token is still valid
+  } catch (error: any) {
+    throw new Error("Refresh token has expired");
+  }
+
+  //generate new accessToken
+  return this.generateAccessToken();
 };
 
 userSchema.methods.generateResetToken = async function (): Promise<string> {

@@ -31,7 +31,7 @@ productRouter.get(
 productRouter.get(
   "/product/:id",
   cacheMiddleware("product"),
-  checkAuthentication,
+  // checkAuthentication,
   getProductHandler
 );
 
