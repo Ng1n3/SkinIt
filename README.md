@@ -12,13 +12,13 @@ This project is a rest API built with a robust set of technologies to ensure sec
 - Mongoose: MongoDB Object Modeling for node.js
 - Nodemailer: Library for sending emails
 - Cors: Middleware to enable CORS
-- Bcrypt: pasword Hashing tool
+- Bcrypt: pasword hashing tool
 - Nodejs Modules: path, crypto, fs module for various utilities
 - Morgan: HTTP request logger
 - Winston: Logging library
 - Redis: In-memory data structure store for caching
 - Zod: Typescript-first schema declaration and validation library
-- Cookie-Parser: Middle ware for parsing cookies
+- Cookie-Parser: Middleware for parsing cookies
 
 ### Database
 
@@ -36,8 +36,8 @@ This project is a rest API built with a robust set of technologies to ensure sec
 
 #### Authentication and Authorization
 
-- JWT (JSON Web Token): implemented to give a flexibel and secure authetication system
-- Permission Based Access Control was implented to ensure that certain persmission are only accessible to some certain roles.
+- JWT (JSON Web Token): implemented to give a flexible and secure authetication system
+- Permission Based Access Control was implemented to ensure that certain permissions are only accessible to some certain roles.
 
 #### LOGGING
 
