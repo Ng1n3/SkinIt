@@ -50,10 +50,10 @@ export interface UserDocument extends UserInput, mongoose.Document {
   updatedAt: Date;
   comparePassword(password: string): Promise<boolean>;
   generateAccessToken(): string;
-  generateRefreshToken(): Promise<string>;
-  regenerateAccessToken(refreshToken: string): Promise<string>;
   generateResetToken(): Promise<string>;
   resetPassword(token: string, newPassword: string): Promise<void>;
+  generateRefreshToken(): Promise<string>;
+  regenerateAccessToken(refreshToken: string): Promise<string>;
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -133,7 +133,7 @@ userSchema.methods.generateRefreshToken = async function (): Promise<string> {
   return refreshToken;
 };
 
-userSchema.methods.regenrateAccessToken = async function (
+userSchema.methods.regenerateAccessToken = async function (
   refreshToken: string
 ): Promise<string> {
   const tokenDocument = this.tokens[0];

@@ -14,6 +14,7 @@ import {
   forgotPasswordHandler,
   getUserHandler,
   getUsersHandler,
+  regenerateAccessTokenHanlder,
   resetPasswordHandler,
   siginUserHandler,
 } from "../controller/users.controller";
@@ -76,5 +77,7 @@ userRouter.post(
   validateResource(resetPasswordSchema),
   resetPasswordHandler
 );
+
+userRouter.post("/regenerate-access-token/:id", regenerateAccessTokenHanlder);
 
 export default userRouter;

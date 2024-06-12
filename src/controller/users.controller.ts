@@ -13,11 +13,13 @@ import {
   forgotPassword,
   getUser,
   getusers,
+  regenerateAccessTokenService,
   resetpassword,
   signin,
 } from "../services/user.service";
 import redisClient from "../utils/redisClient";
 import logger from "../utils/logger";
+import userModel from "../models/user.model";
 
 const DEFAULT_EXPIRATION = Number(process.env.CACHING_DEFAULT_EXPIRATION);
 
@@ -49,7 +51,7 @@ export async function createUserHandler(
       access_Token: acTkn,
     });
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
     return res.status(400).send(error.message);
   }
 }
@@ -61,7 +63,8 @@ export async function siginUserHandler(
   try {
     const user = await signin(req.body);
     const acTkn = user.generateAccessToken();
-    const rfTkn = user.generateRefreshToken();
+    const rfTkn = await user.generateRefreshToken();
+    console.log("refreshToken: ", rfTkn)
 
     res.cookie(REFRESH_TOKEN.cookie.name, rfTkn, REFRESH_TOKEN.cookie.options);
 
@@ -71,7 +74,7 @@ export async function siginUserHandler(
       access_token: acTkn,
     });
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
     res.status(400).send(error.message);
   }
 }
@@ -94,7 +97,7 @@ export async function getUsersHandler(req: Request, res: Response) {
     }
     return res.status(200).send(users);
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
     return res.status(400).send(error.message);
   }
 }
@@ -112,7 +115,7 @@ export async function getUserHandler(
     }
     return res.status(200).send(user);
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
     res.status(404).send(error.message);
   }
 }
@@ -125,7 +128,7 @@ export async function editUserHandler(
     const user = await editUser(req.body, req.params.id);
     res.status(200).send(user);
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
     res.status(400).send(error.message);
   }
 }
@@ -141,7 +144,7 @@ export async function deleteUserHandler(
       message: "user Deleted",
     });
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
     res.status(400).send(error.message);
   }
 }
@@ -155,7 +158,7 @@ export async function forgotPasswordHandler(
     const reponse = await forgotPassword(email);
     res.status(200).send(reponse);
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
     res.status(400).send({ error: error.message });
   }
 }
@@ -169,7 +172,30 @@ export async function resetPasswordHandler(
     const response = await resetpassword(token, email, newPassword);
     return res.status(200).send(response);
   } catch (error: any) {
-    logger.error(error.message)
+    logger.error(error.message);
+    res.status(400).send({ error: error.message });
+  }
+}
+
+export async function regenerateAccessTokenHanlder(
+  req: Request<{ id: string }, {}, { refreshToken: string }>,
+  res: Response
+) {
+  try {
+    const { id } = req.params;
+    const { refreshToken } = req.body;
+    
+    if (!refreshToken)
+      return res.status(400).send({ error: "refresh Token required" });
+
+    const newAccessToken = await regenerateAccessTokenService(refreshToken, id);
+
+    return res.status(201).send({
+      success: true,
+      newAccessToken,
+    });
+  } catch (error: any) {
+    logger.error(error.message);
     res.status(400).send({ error: error.message });
   }
 }

@@ -1,10 +1,17 @@
+import dotenv from 'dotenv'
+import Jwt from 'jsonwebtoken'
+
 import userModel, {
   EditUserInput,
   SigninUserInputs,
   UserInput,
 } from "../models/user.model";
 import transporter from "../utils/nodemailer";
+dotenv.config()
 
+const REFRESH_TOKEN_SECRET = process.env.AUTH_REFRESH_TOKEN_SECRET as string;
+
+if(!REFRESH_TOKEN_SECRET) throw new Error('some secrets are missing');
 interface getUsersOptions {
   page?: number;
   limit?: number;
@@ -135,6 +142,20 @@ export async function resetpassword(
     await user.resetPassword(token, newPassword);
 
     return { message: "Password reset Succesfull" };
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+}
+
+export async function regenerateAccessTokenService(refreshToken: string, id: string) {
+  try {
+    const user = await userModel.findById(id);
+    if (!user) throw new Error("user not found");
+    // Jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
+
+
+    const newAccessToken = await user.regenerateAccessToken(refreshToken);
+    return {newAccessToken}
   } catch (error: any) {
     throw new Error(error.message);
   }
