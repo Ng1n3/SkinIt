@@ -8,8 +8,8 @@ const errorHandler = (
   next: NextFunction
 ) => {
   logger.error(err.message);
-  if (err.message === "You are not authenticated") {
-    return res.status(401).json({ error: err.message });
+  if (err.message === "You are not Authenticated") {
+    return res.status(403).json({ error: err.message });
   } else if (err.message === "Invalid token") {
     return res.status(401).json({ error: err.message });
   } else if (err.name === "JsonWebTokenError") {
@@ -19,7 +19,7 @@ const errorHandler = (
   }
 
   // Default to 500 server error
-  res.status(500).json({ error: "An unexpected error occurred" });
+  // res.status(500).json({ error: "An unexpected error occurred" });
   next();
 };
 

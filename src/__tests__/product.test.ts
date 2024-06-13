@@ -4,11 +4,22 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { connectRedis, disConnectRedis } from "../utils/redisClient";
 import { createProduct } from "../services/product.service";
-import { createproductHandler } from "../controller/product.controller";
 
 const app = createServer();
 
 const userId = new mongoose.Types.ObjectId().toString();
+
+export const userPayLoad = {
+  _id: userId,
+  name: "Emmmanuel",
+  email: "emmanuel2@gmail.com",
+};
+
+export const user = {
+  name: "tom",
+  password: "123456",
+  email: "tom@gmail.com",
+};
 
 export const productPayload = {
   name: "iPhone 12 Pro max 128GB",
@@ -57,19 +68,44 @@ describe("product", () => {
     });
   });
 
-  // describe('create product route', () => {
-  //   describe('given the user is not logged in', () => {
-  //     it('should be a 403', async() => {
-  //       const {statusCode} = await supertest(app).post('/api/v1/products')
+  describe("create product route", () => {
+    describe("given the user is not logged in", () => {
+      it("should be a 403", async () => {
+        const { statusCode } = await supertest(app).post(
+          "/api/v1/product-create"
+        );
 
-  //       expect(statusCode).toBe(403);
-  //     })
-  //   })
+        expect(statusCode).toBe(403);
+      });
+    });
 
-  // describe('given the user is logged in', () => {
-  //   it('should be a 201 and create the product', async() => {
-  //     const jwt = signJwt()
-  //   })
-  // })
-  // })
+    describe("given the user wants to signup", () => {
+      it("should be a 201 and create the product", async () => {
+        const signupResponse = await supertest(app)
+          .post("/api/v1/signup")
+          .send(user);
+
+        expect(signupResponse.statusCode).toBe(201);
+
+        const { access_Token } = signupResponse.body;
+
+        const productResponse = await supertest(app)
+          .post("/api/v1/product-create")
+          .set("Authorization", `Bearer ${access_Token}`)
+          .send(productPayload);
+
+          console.log("product Response: ", productResponse)
+        expect(productResponse.statusCode).toBe(201);
+        expect(productResponse.body).toEqual({
+          _id: expect.any(String),
+          name: "iPhone 12 Pro max 128GB",
+          description: "An iphone for everybody",
+          genre: ["phone", "electronics"],
+          units: "5",
+          price: "635000",
+          seller: expect.any(String),
+        });
+      });
+    });
+  });
 });

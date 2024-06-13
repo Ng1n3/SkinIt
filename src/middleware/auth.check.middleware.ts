@@ -40,7 +40,7 @@ export default async function checkAuthentication(
       throw new Error("Invalid token");
     }
   } catch (error: any) {
-    console.log(error);
+    console.log("auth Error", error);
     next(error);
   }
 }
