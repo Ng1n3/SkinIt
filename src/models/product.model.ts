@@ -32,12 +32,12 @@ const productSchema = new mongoose.Schema<ProductDocument>(
     genre: { type: [String], required: true },
     description: { type: String, required: true },
     units: { type: String, required: true },
-    productId: {
-      type: String,
-      required: true,
-      unique: true,
-      default: () => new mongoose.Types.ObjectId().toString(),
-    },
+    // productId: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    //   default: () => new mongoose.Types.ObjectId().toString(),
+    // },
     seller: { type: String, required: true },
   },
   {
@@ -48,9 +48,9 @@ const productSchema = new mongoose.Schema<ProductDocument>(
 productSchema.set("toJSON", {
   virtuals: true,
   transform: function (doc, ret) {
-    const { name, price, genre, description, units, seller } = ret;
+    const { _id, name, price, genre, description, units, seller } = ret;
 
-    return { name, price, genre, description, units, seller };
+    return { _id, name, price, genre, description, units, seller };
   },
 });
 

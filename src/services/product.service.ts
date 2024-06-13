@@ -17,6 +17,7 @@ export async function createProduct(
 ): Promise<ProductDocument> {
   try {
     const product = await productModel.create(input);
+    console.log("created Product", product);
     return product;
   } catch (error: any) {
     throw new Error(error.message);
@@ -54,6 +55,7 @@ export async function getProducts(options: getProductOptions) {
 export async function getProduct(id: string) {
   try {
     const product = await productModel.findById(id);
+    console.log("id: ", id);
     if (!product) throw new Error("product not found");
     return product;
   } catch (error: any) {
