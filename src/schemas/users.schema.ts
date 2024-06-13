@@ -8,9 +8,15 @@ export const createUserSchema = object({
     password: string({
       required_error: "password is required",
     }).min(6, "password too short - 6 minimum characters needed"),
+    passwordConfirmation: string({
+      required_error: "password confirmation is required",
+    }),
     email: string({
       required_error: "email required",
     }).email("enter a valid email"),
+  }).refine((data) => data.password === data.passwordConfirmation, {
+    message: "passwords do not match",
+    path: ["passwordConfirmation"],
   }),
 });
 
@@ -54,7 +60,6 @@ export const resetPasswordSchema = object({
     }).min(6, "Passoword too short - 6 minimum characters needed"),
   }),
 });
-
 
 export type CreateuserInput = TypeOf<typeof createUserSchema>;
 export type EdituserInput = TypeOf<typeof editUserSchema>;
