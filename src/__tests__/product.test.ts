@@ -18,6 +18,7 @@ export const userPayLoad = {
 export const user = {
   name: "tom",
   password: "123456",
+  passwordConfirmation: "123456",
   email: "tom@gmail.com",
 };
 
@@ -57,7 +58,6 @@ describe("product", () => {
         const product = await createProduct(productPayload);
         const productID = product._id?.toString();
 
-        console.log("product: ", productID);
         const { body, statusCode } = await supertest(app)
           .get(`/api/v1/product/${productID}`)
           .expect(200);
@@ -94,7 +94,6 @@ describe("product", () => {
           .set("Authorization", `Bearer ${access_Token}`)
           .send(productPayload);
 
-          console.log("product Response: ", productResponse)
         expect(productResponse.statusCode).toBe(201);
         expect(productResponse.body).toEqual({
           _id: expect.any(String),
